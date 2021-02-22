@@ -13,6 +13,7 @@ import { plantsPropTypes } from 'proptypes/PlantsPropTypes';
  * @returns {*}
  */
 const Plants = ({ plants, ...rest }) => {
+  console.log(plants);
   return (
     <Table hover striped responsive>
       <thead className="thead-dark">

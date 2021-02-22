@@ -137,7 +137,7 @@ class PlantsPage extends React.PureComponent {
       .then((response) => {
         const data = response.data;
         const plant = plainToClass(Plant, data);
-        const plants = [...this.state.plants];
+        const plants = [...this.state.plants]
         plants.push(plant);
         this.setState({plants: plants});
         this.props.history.push(path);
