@@ -1,9 +1,9 @@
 import React from 'react';
-import planetEarthImage from 'images/planet-earth.svg';
+import planetEarthImage from 'images/planting.svg';
 
 const Logo = (props) => {
   return (
-    <img src={ planetEarthImage } { ...props } alt='Plantastic logotype: earth surrounded by a plant branch' />
+    <img src={ planetEarthImage } { ...props } alt='Plantastic logotype: planting plants' />
   );
 };
 
