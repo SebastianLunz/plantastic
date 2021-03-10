@@ -7,7 +7,7 @@ import PlantFormRoom from 'components/plants/plant-form/fields/PlantFormRoom';
 import PlantFormPlant from "components/plants/plant-form/fields/PlantFormPlant";
 import { plantFormInformationPropTypes } from 'proptypes/PlantFormPropTypes';
 
-const UserPlantFormInformation = ({ categories, rooms, plants }) => {
+const UserPlantFormInformation = ({ rooms, plants }) => {
   return (
     <PlantFormSection>
       <PlantFormSectionHeader>Basic information</PlantFormSectionHeader>
@@ -26,6 +26,6 @@ const UserPlantFormInformation = ({ categories, rooms, plants }) => {
   );
 };
 
-UserPlantFormInformation.propTypes = plantFormInformationPropTypes;
+// UserPlantFormInformation.propTypes = plantFormInformationPropTypes;
 
 export default React.memo(UserPlantFormInformation);
