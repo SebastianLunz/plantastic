@@ -52,7 +52,7 @@ const PlantForm = (props) => {
             cancelLabel="Back to list"
             submitDisabled={ !isValid }
             submitLabel={ key ? 'Save changes' : 'Create new plant' }
-            deleteLabel="Delete plant"
+            deleteLabel="Delete"
             onDelete={ onDelete }
             onBackToList={ onBackToList }
           />
