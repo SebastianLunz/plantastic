@@ -23,6 +23,7 @@ class UserPlantsPage extends React.PureComponent {
     userPlantsInProgress: false,
     addUserPlantErrorMessage: "",
     updateUserPlantErrorMessage: "",
+    deleteUserPlantErrorMessage: "",
   };
 
   componentDidMount() {
@@ -131,7 +132,7 @@ class UserPlantsPage extends React.PureComponent {
   /**
    * @param {UserPlant} userPlant
    */
-  onSubmitPlantCreate = (userPlant) => {
+  onSubmitPlantAdd = (userPlant) => {
     console.warn('Add plant:');
     console.log(userPlant);
     const path = generatePath(Routes.USER_PLANTS);
@@ -188,24 +189,23 @@ class UserPlantsPage extends React.PureComponent {
   onPlantDelete = (userPlant) => {
     console.warn('Edited user plant to delete:');
     const path = generatePath(Routes.USER_PLANTS);
+    const userPlantId = this.state.initialValues.id;
 
-    axios.delete(Api.USER_PLANTS + userPlant.id + '/', userPlant)
+    axios.delete(Api.USER_PLANTS + userPlantId + '/', userPlant)
       .then((response) => {
         const userPlants = [...this.state.userPlants];
-        const getIndex = userPlants.findIndex(item => item.id === userPlant.id);
-        // if (getIndex !== -1)
-        userPlants.splice(userPlant.id, 1);
+        const userPlantToDelete = userPlants.findIndex(item => item.id === userPlantId);
+        userPlants.splice(userPlantToDelete, 1);
         this.setState({userPlants: userPlants});
         this.props.history.push(path);
       })
       .catch((error) => {
-        const plantsErrorMessage = "Error updating user plant";
+        const plantsErrorMessage = "Error deleting user plant";
         this.props.history.push(path);
         this.setState({
-          updateUserPlantErrorMessage: plantsErrorMessage,
+          deleteUserPlantErrorMessage: plantsErrorMessage,
         });
       });
-    console.log(userPlant, userPlant.id);
   }
 
   onSubmit = (userPlant, routeProps) => {
@@ -224,7 +224,8 @@ class UserPlantsPage extends React.PureComponent {
       userPlantsErrorMessage,
       userPlantsInProgress,
       userPlantsSuccess,
-      createUserPlantErrorMessage,
+      addUserPlantErrorMessage,
+      updateUserPlantErrorMessage,
     } = this.state;
 
     const {
@@ -246,9 +247,11 @@ class UserPlantsPage extends React.PureComponent {
           render={() =>
             <React.Fragment>
               {
-                createUserPlantErrorMessage !== "" && <p>{createUserPlantErrorMessage}</p>
+                addUserPlantErrorMessage !== "" && <p>{addUserPlantErrorMessage}</p>
               }
-
+              {
+                updateUserPlantErrorMessage !== "" && <p>{updateUserPlantErrorMessage}</p>
+              }
               <UserPlantList
                 categories={categories}
                 onEdit={this.onEdit}
@@ -271,7 +274,8 @@ class UserPlantsPage extends React.PureComponent {
               categories={categories}
               formLabel="Add new plant"
               initialValues={initialValues}
-              onSubmit={this.onSubmitPlantCreate}
+              onSubmit={this.onSubmitPlantAdd}
+              onBackToList={this.navigateToPlantList}
               rooms={rooms}
               plants={plants}
             />
@@ -286,6 +290,7 @@ class UserPlantsPage extends React.PureComponent {
               initialValues={initialValues}
               onSubmit={this.onSubmitPlantUpdate}
               onDelete={this.onPlantDelete}
+              onBackToList={this.navigateToPlantList}
               rooms={rooms}
               plants={plants}
             />

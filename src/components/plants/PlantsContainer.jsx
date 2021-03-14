@@ -1,8 +1,8 @@
 import React from "react";
 import axios from "axios";
-import { PLANTS_FETCH_DELAY, delay } from "shared/Debug";
-import { plainToClass } from 'serializers/Serializer';
-import { Api } from "services/Api";
+import {PLANTS_FETCH_DELAY, delay} from "shared/Debug";
+import {plainToClass} from 'serializers/Serializer';
+import {Api} from "services/Api";
 import Plant from 'models/Plant';
 
 
@@ -16,8 +16,31 @@ const withPlants = (WrappedComponent) => {
         plantsErrorMessage: undefined,
         plantsSuccess: undefined,
         plantsInProgress: false,
+        createPlantErrorMessage: "",
+        updatePlantErrorMessage: "",
+        deletePlantErrorMessage: "",
       };
     }
+
+    handlePlantListUpdate = (plants) => {
+      this.setState({plants: plants});
+    };
+
+    handlePlantsInProgress = (plantsInProgress) => {
+      this.setState({plantsInProgress: plantsInProgress});
+    }
+
+    handleCreatePlantErrorMessage = (createPlantErrorMessage) => {
+      this.setState({createPlantErrorMessage: createPlantErrorMessage});
+    };
+
+    handleUpdatePlantErrorMessage = (updatePlantErrorMessage) => {
+      this.setState({updatePlantErrorMessage: updatePlantErrorMessage});
+    };
+
+    handleDeletePlantErrorMessage = (deletePlantErrorMessage) => {
+      this.setState({deletePlantErrorMessage: deletePlantErrorMessage});
+    };
 
     /**
      *
@@ -39,7 +62,7 @@ const withPlants = (WrappedComponent) => {
       console.log('Method Plants.fetchPlantsDelayed() fired');
 
       const plantsInProgress = true;
-      this.setState({ plantsInProgress });
+      this.setState({plantsInProgress});
 
       return delay(PLANTS_FETCH_DELAY, this.fetchPlants)
         .finally(this.fetchPlantsFinally);
@@ -60,7 +83,7 @@ const withPlants = (WrappedComponent) => {
     fetchPlantsFinally = () => {
       console.log('Plants finally');
       const plantsInProgress = false;
-      this.setState({ plantsInProgress });
+      this.setState({plantsInProgress});
     };
 
     fetchPlantsSuccess = (response, resolve) => {
@@ -81,12 +104,18 @@ const withPlants = (WrappedComponent) => {
       resolve();
     };
 
+
     render() {
       return (
         <WrappedComponent
-          { ...this.state }
-          { ...this.props }
+          {...this.state}
+          {...this.props}
           fetchPlants={ this.fetchPlantsDelayed }
+          handlePlantListUpdate={ this.handlePlantListUpdate }
+          handlePlantsInProgress={ this.handlePlantsInProgress }
+          handleCreatePlantErrorMessage={ this.handleCreatePlantErrorMessage }
+          handleUpdatePlantErrorMessage={ this.handleUpdatePlantErrorMessage }
+          handleDeletePlantErrorMessage={ this.handleDeletePlantErrorMessage }
         />
       );
     }
