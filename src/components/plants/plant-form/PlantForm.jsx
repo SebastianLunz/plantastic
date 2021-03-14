@@ -25,9 +25,11 @@ const PlantForm = (props) => {
     categories,
     initialValues,
     rooms,
+    onDelete,
+    onBackToList,
   } = props;
 
-  const key = initialValues.id;
+  const key = initialValues.id + Date.now();
 
   const formikProps = {
     key,
@@ -47,9 +49,12 @@ const PlantForm = (props) => {
           <PlantFormCultivation />
           <PlantFormMaintenance />
           <PlantFormButtons
-            cancelLabel="Cancel"
+            cancelLabel="Back to list"
             submitDisabled={ !isValid }
             submitLabel={ key ? 'Save changes' : 'Create new plant' }
+            deleteLabel="Delete"
+            onDelete={ onDelete }
+            onBackToList={ onBackToList }
           />
         </Form>
       ) }

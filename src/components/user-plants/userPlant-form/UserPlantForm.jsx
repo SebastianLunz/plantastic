@@ -25,8 +25,8 @@ const UserPlantForm = (props) => {
     initialValues,
     rooms,
     plants,
-    userPlants,
     onDelete,
+    onBackToList,
   } = props;
 
   const key = initialValues.id + Date.now();
@@ -45,16 +45,15 @@ const UserPlantForm = (props) => {
           <UserPlantFormInformation
             rooms={ rooms }
             plants={ plants }
-            userPlants={ userPlants }
           />
           <UserPlantFormMaintenance />
           <PlantFormButtons
-            cancelLabel="Cancel"
+            cancelLabel="Back to list"
             submitDisabled={ !isValid }
             submitLabel={ key ? 'Save changes' : 'Add new plant' }
-            deleteLabel="Delete plant"
-            onDelete={onDelete}
-            key={key}
+            deleteLabel="Delete"
+            onDelete={ onDelete }
+            onBackToList={ onBackToList }
           />
         </Form>
       ) }
