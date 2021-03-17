@@ -1,129 +1,95 @@
-import { Card, CardBody } from "reactstrap";
 import React from "react";
 import axios from "axios";
-import InProgress from 'components/shared/InProgress';
-import Plants from "components/plants/Plants";
-import { delay, PLANTS_FETCH_DELAY } from "shared/Debug";
-import OperationFailed from 'components/shared/OperationFailed';
-import Api from 'constants/Api';
-import Plant from 'models/Plant';
+import { PLANTS_FETCH_DELAY, delay } from "shared/Debug";
 import { plainToClass } from 'serializers/Serializer';
-import withCategories from 'components/categories/Categories';
-import withRooms from 'components/rooms/Rooms';
-import { withRoomsPropTypes } from 'proptypes/RoomsPropTypes';
-import { withCategoriesPropTypes } from 'proptypes/CategoriesPropTypes';
+import { Api } from "services/Api";
+import Plant from 'models/Plant';
 
-class PlantsContainer extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      plants: [],
-      plantsErrorMessage: undefined,
-      plantsSuccess: undefined,
-      plantsInProgress: false,
+
+const withPlants = (WrappedComponent) => {
+  return class extends React.PureComponent {
+
+    constructor(props) {
+      super(props);
+      this.state = {
+        plants: [],
+        plantsErrorMessage: undefined,
+        plantsSuccess: undefined,
+        plantsInProgress: false,
+      };
+    }
+
+    /**
+     *
+     * @param {function} resolve
+     * @param {function} reject
+     * @returns {Promise}
+     */
+    fetchPlants = (resolve, reject) => {
+      return axios.get(Api.PLANTS)
+        .then((response) => this.fetchPlantsSuccess(response, resolve))
+        .catch((error) => this.fetchPlantsFailure(error, reject));
     };
-  }
 
-  componentDidMount() {
-    const roomsPromise = this.props.fetchRooms();
-    const categoriesPromise = this.props.fetchCategories();
-    const plantsPromise = this.fetchPlantsDelayed();
+    /**
+     * Fetch Plants with some predefined delay.
+     * @returns {Promise<TimerHandler>}
+     */
+    fetchPlantsDelayed = () => {
+      console.log('Method Plants.fetchPlantsDelayed() fired');
 
-    this.setState({ plantsInProgress: true });
+      const plantsInProgress = true;
+      this.setState({ plantsInProgress });
 
-    const additionalPromises = Promise.all([
-      roomsPromise,
-      categoriesPromise,
-      plantsPromise,
-    ]);
+      return delay(PLANTS_FETCH_DELAY, this.fetchPlants)
+        .finally(this.fetchPlantsFinally);
+    };
 
-    additionalPromises
-      .finally(() => this.setState({ plantsInProgress: false }));
+    fetchPlantsFailure = (error, reject) => {
+      const plantsSuccess = false;
+      const plantsErrorMessage = error.message;
 
-  }
-
-  fetchPlants = (resolve, reject) => {
-    return axios.get(Api.PLANTS)
-      .then((response) => {
-        const data = response.data;
-        const plants = data
-          .map(item => plainToClass(Plant, item));
-
-        const plantsErrorMessage = '';
-        const plantsSuccess = true;
-        this.setState({
-          plants,
-          plantsSuccess,
-          plantsErrorMessage,
-        });
-        console.log('Fetched plants');
-        resolve();
-      })
-      .catch((error) => {
-        const plantsErrorMessage = error.message;
-        const plantsSuccess = false;
-        this.setState({
-          plantsErrorMessage,
-          plantsSuccess,
-        });
-        reject();
+      this.setState({
+        plantsErrorMessage,
+        plantsSuccess,
       });
-  };
 
-  fetchPlantsDelayed() {
-    console.log('Method PlantsContainer.fetchPlantsDelayed() fired');
-    return delay(PLANTS_FETCH_DELAY, this.fetchPlants);
-  }
+      reject();
+    };
 
-  render() {
-    const {
-      plants,
-      plantsErrorMessage,
-      plantsInProgress,
-      plantsSuccess,
-    } = this.state;
+    fetchPlantsFinally = () => {
+      console.log('Plants finally');
+      const plantsInProgress = false;
+      this.setState({ plantsInProgress });
+    };
 
-    const {
-      categories,
-      categoriesSuccess,
-      rooms,
-      roomsSuccess
-    } = this.props;
+    fetchPlantsSuccess = (response, resolve) => {
+      const data = response.data;
 
-    const totalPlants = plants.length;
-    const success = categoriesSuccess && plantsSuccess && roomsSuccess;
+      const plants = data.map(item => plainToClass(Plant, item));
+      const plantsSuccess = true;
+      const plantsErrorMessage = '';
 
-    return (
-      <Card className="mb-4">
-        <CardBody>
-          <h3 className="mb-3">List of plants</h3>
-          <p>You have { totalPlants } plants in all your rooms.</p>
+      this.setState({
+        plants,
+        plantsSuccess,
+        plantsErrorMessage,
+      });
 
-          <InProgress inProgress={ plantsInProgress } />
+      console.log('Fetched plants');
 
-          <OperationFailed isFailed={ plantsSuccess === false }>
-            <strong>Failed to fetch plants.</strong>
-            { ' Reason: ' }
-            { plantsErrorMessage }
-          </OperationFailed>
+      resolve();
+    };
 
-          {
-            success &&
-            <Plants
-              categories={ categories }
-              plants={ plants }
-              rooms={ rooms }
-            />
-          }
-        </CardBody>
-      </Card>
-    );
+    render() {
+      return (
+        <WrappedComponent
+          { ...this.state }
+          { ...this.props }
+          fetchPlants={ this.fetchPlantsDelayed }
+        />
+      );
+    }
   }
 }
-
-PlantsContainer.propTypes = {
-  ...withRoomsPropTypes,
-  ...withCategoriesPropTypes,
-};
-
-export default withRooms(withCategories(PlantsContainer));
+export default withPlants;
