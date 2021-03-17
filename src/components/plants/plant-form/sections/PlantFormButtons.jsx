@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 /**
  * @component
  */
-const PlantFormButtons = ({ cancelLabel, submitDisabled, submitLabel }) => {
+const PlantFormButtons = ({ cancelLabel, submitDisabled, submitLabel, deleteLabel, onDelete }) => {
   return (
     <React.Fragment>
       <hr className="mb-4 mt-4" />
@@ -16,6 +16,12 @@ const PlantFormButtons = ({ cancelLabel, submitDisabled, submitLabel }) => {
         <Button color="secondary" type="reset" className="ml-0 ml-md-2">
           { cancelLabel }
         </Button>
+        {
+          onDelete &&
+          <Button color="danger" type="button" className="ml-0 ml-md-2" onClick={onDelete}>
+            { deleteLabel }
+          </Button>
+        }
       </FormGroup>
     </React.Fragment>
   );
