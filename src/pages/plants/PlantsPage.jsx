@@ -5,6 +5,7 @@ import Plant from 'models/Plant';
 import {classToPlain, plainToClass} from 'serializers/Serializer';
 import withCategories from 'components/categories/Categories';
 import withRooms from 'components/rooms/Rooms';
+import withPlants from "components/plants/PlantsContainer";
 import {withRoomsPropTypes} from 'proptypes/RoomsPropTypes';
 import {withCategoriesPropTypes} from 'proptypes/CategoriesPropTypes';
 import PlantFormCard from 'components/plants/PlantFormCard';
@@ -15,19 +16,18 @@ import Routes from 'constants/Routes';
 import PlantList from 'components/plants/PlantList';
 import memoize from 'lodash-es/memoize';
 
+
 class PlantsPage extends React.PureComponent {
   state = {
-    plants: [],
-    plantsErrorMessage: undefined,
-    plantsSuccess: undefined,
     plantsInProgress: false,
     createPlantErrorMessage: "",
+    updatePlantErrorMessage: "",
   };
 
   componentDidMount() {
     const roomsPromise = this.props.fetchRooms();
     const categoriesPromise = this.props.fetchCategories();
-    const plantsPromise = this.fetchPlantsDelayed();
+    const plantsPromise = this.props.fetchPlants();
 
     plantsPromise
       .then(() => this.updateInitialValuesFromLocation(this.props.location));
@@ -67,7 +67,7 @@ class PlantsPage extends React.PureComponent {
 
     if (editPath !== null) {
       const plantId = +editPath.params.plantId;
-      const plants = this.state.plants;
+      const plants = this.props.plants;
       const plant = plants.find((item) => item.id === plantId);
       const initialValues = getInitialValues(plant);
       this.setState({initialValues});
@@ -80,40 +80,6 @@ class PlantsPage extends React.PureComponent {
     }
 
   };
-
-  fetchPlants = (resolve, reject) => {
-    return axios.get(Api.PLANTS)
-      .then((response) => {
-        const data = response.data;
-
-        const plants = data
-          .map(item => plainToClass(Plant, item));
-
-        const plantsErrorMessage = '';
-        const plantsSuccess = true;
-        this.setState({
-          plants,
-          plantsSuccess,
-          plantsErrorMessage,
-        });
-        console.log('Fetched plants');
-        resolve();
-      })
-      .catch((error) => {
-        const plantsErrorMessage = error.message;
-        const plantsSuccess = false;
-        this.setState({
-          plantsErrorMessage,
-          plantsSuccess,
-        });
-        reject();
-      });
-  };
-
-  fetchPlantsDelayed() {
-    console.log('Method PlantsContainer.fetchPlantsDelayed() fired');
-    return delay(PLANTS_FETCH_DELAY, this.fetchPlants);
-  }
 
   navigateToPlantList = () => {
     this.props.history.push(Routes.PLANTS);
@@ -132,12 +98,11 @@ class PlantsPage extends React.PureComponent {
     console.log(plant);
     const path = generatePath(Routes.PLANTS);
 
-
-    axios.post("pi" + Api.PLANTS, classToPlain(plant))
+    axios.post(Api.PLANTS, classToPlain(plant))
       .then((response) => {
         const data = response.data;
         const plant = plainToClass(Plant, data);
-        const plants = [...this.state.plants]
+        const plants = [...this.props.plants]
         plants.push(plant);
         this.setState({plants: plants});
         this.props.history.push(path);
@@ -149,8 +114,6 @@ class PlantsPage extends React.PureComponent {
           createPlantErrorMessage: plantsErrorMessage,
         });
       });
-
-
   };
 
   /**
@@ -159,6 +122,25 @@ class PlantsPage extends React.PureComponent {
   onSubmitPlantUpdate = (plant) => {
     console.warn('Edited plant:');
     console.log(plant);
+    const path = generatePath(Routes.PLANTS);
+
+    axios.put(Api.PLANTS + plant.id + '/', classToPlain(plant))
+      .then((response) => {
+        const data = response.data;
+        const plant = plainToClass(Plant, data);
+        const plants = [...this.props.plants];
+        const getIndex = plants.findIndex(item => item.id === plant.id);
+        plants[getIndex] = plant;
+        this.setState({plants: plants});
+        this.props.history.push(path);
+      })
+      .catch((error) => {
+        const plantsErrorMessage = "Error updating plant";
+        this.props.history.push(path);
+        this.setState({
+          updatePlantErrorMessage: plantsErrorMessage,
+        });
+      });
   };
 
   onSubmit = (plant, routeProps) => {
@@ -173,18 +155,19 @@ class PlantsPage extends React.PureComponent {
   render() {
     const {
       initialValues,
-      plants,
       plantsErrorMessage,
       plantsInProgress,
-      plantsSuccess,
       createPlantErrorMessage,
+      updatePlantErrorMessage,
     } = this.state;
 
     const {
+      plants,
+      plantsSuccess,
       categories,
       categoriesSuccess,
       rooms,
-      roomsSuccess
+      roomsSuccess,
     } = this.props;
 
     const success = categoriesSuccess && plantsSuccess && roomsSuccess;
@@ -199,7 +182,9 @@ class PlantsPage extends React.PureComponent {
               {
                 createPlantErrorMessage !== "" && <p>{createPlantErrorMessage}</p>
               }
-
+              {
+                updatePlantErrorMessage !== "" && <p>{updatePlantErrorMessage}</p>
+              }
               <PlantList
                 categories={categories}
                 onEdit={this.onEdit}
@@ -248,13 +233,4 @@ PlantsPage.propTypes = {
   ...withCategoriesPropTypes,
 };
 
-export default withRooms(withCategories(withRouter(PlantsPage)));
-
-// const plants = [ ...this.state.plants ];
-// plants.unshift(plant);
-// this.setState({ plants });
-
-// const data = classToPlain(plant);
-// return axios.post(Api.PLANTS, data)
-//   .then(this.onSubmitPlantCreateSuccess)
-//   .catch(this.onSubmitPlantCreateError)
+export default withRooms(withCategories(withPlants(withRouter(PlantsPage))));
