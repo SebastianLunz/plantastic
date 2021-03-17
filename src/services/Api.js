@@ -31,6 +31,7 @@ class Api {
   static PLANTS = '/plants/';
   static CATEGORIES = '/categories/';
   static ROOMS = '/rooms/';
+  static USER_PLANTS = '/user-plants/';
 
   /**
    * @private
