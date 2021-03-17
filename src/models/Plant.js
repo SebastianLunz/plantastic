@@ -64,6 +64,10 @@ class Plant {
   @JsonType(Number)
   @JsonProperty()
   wateringInterval = 0;
+
+  @JsonType(Number)
+  @JsonProperty()
+  user = 1;
 }
 
 export default Plant;
