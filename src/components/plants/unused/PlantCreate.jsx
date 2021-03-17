@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PlantForm from './plant-form/PlantForm';
+import PlantForm from 'components/plants/plant-form/PlantForm';
 import { Card, CardBody, CardHeader } from 'reactstrap';
 
 const PlantCreate = (props) => {
