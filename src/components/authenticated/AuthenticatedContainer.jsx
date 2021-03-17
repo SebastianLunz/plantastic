@@ -6,6 +6,7 @@ import CategoriesContainer from 'components/categories/CategoriesContainer';
 import RoomsContainer from 'components/rooms/RoomsContainer';
 import Dashboard from 'components/dashboard/Dashboard';
 import PlantsPage from 'pages/plants/PlantsPage';
+import UserPlantsPage from "pages/plants/UserPlantsPage";
 
 const AuthenticatedContainer = function () {
 
@@ -15,6 +16,7 @@ const AuthenticatedContainer = function () {
         <Route path={ Routes.CATEGORIES } render={ () => <CategoriesContainer /> } />
         <Route path={ Routes.PLANTS } render={ () => <PlantsPage /> } />
         <Route path={ Routes.ROOMS } render={ () => <RoomsContainer /> } />
+        <Route path={ Routes.USER_PLANTS } render={ () => <UserPlantsPage /> } />
         <Route exact path={ Routes.ROOT } render={ () => <Dashboard /> } />
       </Switch>
     </Container>
