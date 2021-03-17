@@ -1,5 +1,5 @@
 import React from "react";
-import "./Plant.scss";
+import "components/plants/Plant.scss";
 import find from 'lodash-es/find';
 import moment from 'moment-es6';
 import {
