@@ -6,6 +6,7 @@ const navbarItems = [
   { path: Routes.PLANTS, icon: faSeedling, name: 'Plants' },
   { path: Routes.CATEGORIES, icon: faLeaf, name: 'Categories' },
   { path: Routes.ROOMS, icon: faColumns, name: 'Rooms' },
+  { path: Routes.USER_PLANTS, icon: faSeedling, name: 'User Plants' },
 ];
 
 export default navbarItems;
