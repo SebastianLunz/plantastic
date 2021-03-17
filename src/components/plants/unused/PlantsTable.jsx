@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "reactstrap";
-import PlantRow from "components/plants/PlantRow";
+import PlantRow from "components/plants/unused/PlantRow";
 import { plantsPropTypes } from 'proptypes/PlantsPropTypes';
 import { categoriesPropTypes } from 'proptypes/CategoriesPropTypes';
 import { roomsPropTypes } from 'proptypes/RoomsPropTypes';
